@@ -3,27 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Навигация</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>AR Маршрутизация</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.min.js"></script>
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 </head>
 <body>
-  <div id="camera-view">
-    <a-scene embedded arjs="sourceType: webcam;">
-      <a-camera gps-camera rotation-reader></a-camera>
-      <a-entity id="ar-marker" gps-entity-place></a-entity>
-    </a-scene>
-  </div>
-  <div id="map"></div>
-  <div id="controls">
-    <select id="locationSelect">
-      <option value="">Выберите локацию</option>
-    </select>
-    <div id="distance"></div>
-  </div>
+  <h2>Выберите место назначения</h2>
+  <select id="locationSelect">
+    <option value="">Выберите место</option>
+  </select>
+  <div id="distance"></div>
+
+  <a-scene embedded arjs="sourceType: webcam;">
+    <a-camera gps-camera rotation-reader></a-camera>
+  </a-scene>
+
   <script src="app.js"></script>
 </body>
 </html>

@@ -1,14 +1,7 @@
-// Инициализация карты
-const map = L.map('map').setView([55.7558, 37.6176], 10); // Центрируем на Москве
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors'
-}).addTo(map);
+// API-ключ Mapbox
+const MAPBOX_API_KEY = 'pk.eyJ1Ijoic2FzaGFraXJpbHYiLCJhIjoiY20ybTBsNGtnMGduMzJrc2Y2bGt0NjV0MSJ9.X2O9EyRNKBlB6B3b7Rfx2g';
 
-let destinationMarker = null;
-let targetLocation = null;
-const distanceDisplay = document.getElementById("distance");
-
-// Загрузка данных о локациях
+// Инициализация списка локаций
 fetch('locations.json')
   .then(response => response.json())
   .then(data => {
@@ -21,57 +14,54 @@ fetch('locations.json')
     });
   });
 
+let targetLocation = null;
+
 // Обработчик выбора локации
 document.getElementById('locationSelect').addEventListener('change', (event) => {
   targetLocation = JSON.parse(event.target.value);
   if (targetLocation) {
-    setDestination(targetLocation);
+    calculateRoute(targetLocation);
   }
 });
 
-// Установка цели на карте и в AR
-function setDestination(location) {
-  if (destinationMarker) map.removeLayer(destinationMarker);
-  destinationMarker = L.marker([location.latitude, location.longitude]).addTo(map)
-    .bindPopup(`<b>${location.name}</b>`).openPopup();
-  map.setView([location.latitude, location.longitude], 14);
-
-  const arMarker = document.getElementById('ar-marker');
-  arMarker.setAttribute('gps-entity-place', `latitude: ${location.latitude}; longitude: ${location.longitude}`);
-  arMarker.setAttribute('text', `value: ${location.name}; align: center;`);
-
-  updateDistance();
-}
-
-// Обновление расстояния до цели
-function updateDistance() {
+// Получение текущей локации и прокладка маршрута
+function calculateRoute(destination) {
   if (navigator.geolocation) {
-    navigator.geolocation.watchPosition(position => {
-      if (targetLocation) {
-        const distance = calculateDistance(
-          position.coords.latitude,
-          position.coords.longitude,
-          targetLocation.latitude,
-          targetLocation.longitude
-        );
-        distanceDisplay.innerText = `Расстояние до ${targetLocation.name}: ${distance.toFixed(2)} метров`;
-      }
+    navigator.geolocation.getCurrentPosition(position => {
+      const startCoords = [position.coords.longitude, position.coords.latitude];
+      const endCoords = [destination.longitude, destination.latitude];
+
+      // Запрос маршрута к API Mapbox
+      fetch(`https://api.mapbox.com/directions/v5/mapbox/walking/${startCoords.join(',')};${endCoords.join(',')}?steps=true&access_token=${MAPBOX_API_KEY}`)
+        .then(response => response.json())
+        .then(data => {
+          const steps = data.routes[0].legs[0].steps;
+          plotRouteInAR(steps);
+        })
+        .catch(error => console.error('Ошибка запроса маршрута:', error));
     });
+  } else {
+    alert("Геолокация не поддерживается вашим браузером");
   }
 }
 
-// Расчет расстояния между двумя точками (формула Гаверсина)
-function calculateDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371e3; // Радиус Земли в метрах
-  const φ1 = lat1 * Math.PI / 180;
-  const φ2 = lat2 * Math.PI / 180;
-  const Δφ = (lat2 - lat1) * Math.PI / 180;
-  const Δλ = (lon2 - lon1) * Math.PI / 180;
+// Отображение маршрута в AR
+function plotRouteInAR(steps) {
+  const scene = document.querySelector('a-scene');
 
-  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-            Math.cos(φ1) * Math.cos(φ2) *
-            Math.sin(Δλ/2) * Math.sin(Δλ/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  // Удаление предыдущих маркеров маршрута
+  document.querySelectorAll('.ar-step').forEach(el => el.remove());
 
-  return R * c; // Возвращает расстояние в метрах
+  // Отображение каждой точки маршрута как маркера
+  steps.forEach((step, index) => {
+    const { maneuver } = step;
+    const marker = document.createElement('a-entity');
+
+    marker.setAttribute('gps-entity-place', `latitude: ${maneuver.location[1]}; longitude: ${maneuver.location[0]}`);
+    marker.setAttribute('text', `value: Step ${index + 1}; align: center;`);
+    marker.setAttribute('scale', '5 5 5');
+    marker.classList.add('ar-step');
+
+    scene.appendChild(marker);
+  });
 }
