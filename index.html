@@ -3,169 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AR Navigation with Target Selection</title>
-    <style>
-      body,
-      html {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-      }
-      #ar-canvas {
-        width: 100vw;
-        height: 100vh;
-      }
-      #info {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        color: white;
-        font-size: 20px;
-      }
-      #target-select {
-        position: absolute;
-        top: 50px;
-        left: 10px;
-        z-index: 2;
-      }
-    </style>
+    <title>AR City Navigation</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   </head>
   <body>
-    <div id="info">Fetching location...</div>
-    <select id="target-select">
-      <option value="">Select Destination</option>
-      <option value="52.5200,13.4050">Berlin</option>
-      <option value="48.8566,2.3522">Paris</option>
-      <option value="40.7128,-74.0060">New York</option>
-    </select>
-    <canvas id="ar-canvas"></canvas>
+    <div id="container">
+      <h2>Choose Destination</h2>
+      <select id="targetSelect"></select>
+      <div id="map" class="map-container"></div>
+    </div>
 
-    <script src="https://threejs.org/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@immersive-web/webxr-polyfill@1.0.1/build/webxr-polyfill.min.js"></script>
+    <a-scene embedded arjs>
+      <a-camera gps-camera rotation-reader></a-camera>
+      <a-entity id="ar-marker" gps-entity-place></a-entity>
+    </a-scene>
 
-    <script>
-      let userLocation = null;
-      let targetLocation = null;
-      let targetMarker = null;
-
-      if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(setUserPosition, showError, {
-          enableHighAccuracy: true,
-        });
-      } else {
-        alert("Geolocation не поддерживается вашим браузером");
-      }
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(
-        75,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        1000
-      );
-      const renderer = new THREE.WebGLRenderer({
-        canvas: document.getElementById("ar-canvas"),
-        alpha: true,
-      });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-
-      const markerGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-      const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-      targetMarker = new THREE.Mesh(markerGeometry, markerMaterial);
-      scene.add(targetMarker);
-      camera.position.z = 5;
-
-      // Обработчик выбора точки
-      document
-        .getElementById("target-select")
-        .addEventListener("change", (event) => {
-          const [lat, lon] = event.target.value.split(",").map(Number);
-          if (lat && lon) {
-            targetLocation = { latitude: lat, longitude: lon };
-            updateTargetPosition();
-          }
-        });
-
-      function setUserPosition(position) {
-        userLocation = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        };
-        document.getElementById(
-          "info"
-        ).innerText = `Lat: ${userLocation.latitude}, Long: ${userLocation.longitude}`;
-        updateTargetPosition();
-      }
-
-      function updateTargetPosition() {
-        if (userLocation && targetLocation) {
-          const distance = calculateDistance(userLocation, targetLocation);
-          document.getElementById(
-            "info"
-          ).innerText += ` | Distance to target: ${distance.toFixed(2)} meters`;
-
-          const direction = calculateBearing(userLocation, targetLocation);
-          targetMarker.position.x = Math.sin(direction) * distance * 0.001;
-          targetMarker.position.y = Math.cos(direction) * distance * 0.001;
-
-          animate();
-        }
-      }
-
-      function animate() {
-        requestAnimationFrame(animate);
-        renderer.render(scene, camera);
-      }
-
-      function showError(error) {
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            alert("Пользователь отклонил запрос на геолокацию.");
-            break;
-          case error.POSITION_UNAVAILABLE:
-            alert("Местоположение недоступно.");
-            break;
-          case error.TIMEOUT:
-            alert("Время запроса истекло.");
-            break;
-          default:
-            alert("Неизвестная ошибка.");
-            break;
-        }
-      }
-
-      // Функция для расчета расстояния между двумя точками (Haversine Formula)
-      function calculateDistance(loc1, loc2) {
-        const R = 6371e3; // радиус Земли в метрах
-        const lat1 = (loc1.latitude * Math.PI) / 180;
-        const lat2 = (loc2.latitude * Math.PI) / 180;
-        const deltaLat = ((loc2.latitude - loc1.latitude) * Math.PI) / 180;
-        const deltaLon = ((loc2.longitude - loc1.longitude) * Math.PI) / 180;
-
-        const a =
-          Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
-          Math.cos(lat1) *
-            Math.cos(lat2) *
-            Math.sin(deltaLon / 2) *
-            Math.sin(deltaLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        return R * c;
-      }
-
-      // Функция для расчета направления в градусах от одной точки к другой
-      function calculateBearing(loc1, loc2) {
-        const lat1 = (loc1.latitude * Math.PI) / 180;
-        const lat2 = (loc2.latitude * Math.PI) / 180;
-        const deltaLon = ((loc2.longitude - loc1.longitude) * Math.PI) / 180;
-
-        const y = Math.sin(deltaLon) * Math.cos(lat2);
-        const x =
-          Math.cos(lat1) * Math.sin(lat2) -
-          Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLon);
-
-        return Math.atan2(y, x);
-      }
-    </script>
+    <script src="app.js"></script>
   </body>
 </html>
