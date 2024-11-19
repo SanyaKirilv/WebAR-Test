@@ -3,13 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Image Tracking</title>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar-js@1.2.0/dist/mindar-image-three.prod.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <title>AR.js Image Tracking</title>
+    <script src="https://cdn.jsdelivr.net/npm/aframe@1.3.0/dist/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js/aframe/build/aframe-ar.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
 </head>
 <body>
-    <div id="ar-container"></div>
-    <script src="script.js"></script>
+    <a-scene embedded arjs>
+        <!-- Маркер изображения -->
+        <a-marker type="pattern" url="marker.patt">
+            <!-- Добавляем 3D-объект (куб) -->
+            <a-box position="0 0.5 0" material="color: red;"></a-box>
+        </a-marker>
+
+        <!-- Камера -->
+        <a-entity camera></a-entity>
+    </a-scene>
 </body>
 </html>
