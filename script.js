@@ -1,40 +1,40 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        // Настройка контейнера и MindAR
-        const container = document.getElementById("ar-container");
+    const container = document.getElementById("ar-container");
 
+    try {
+        // Инициализация MindAR
         const mindarThree = new window.MINDAR.IMAGE.MindARThree({
             container: container,
-            imageTargetSrc: "./targets.mind", // Путь к таргету
+            imageTargetSrc: "./targets.mind", // Путь к файлу с таргетом
         });
 
         const { renderer, scene, camera } = mindarThree;
 
-        // Добавляем свет в сцену
+        // Добавляем свет
         const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
         scene.add(light);
 
-        // Добавляем 3D-объект (например, куб)
+        // Создаем объект
         const boxGeometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-        const boxMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+        const boxMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
         const box = new THREE.Mesh(boxGeometry, boxMaterial);
 
-        // Привязываем объект к таргету
-        const anchor = mindarThree.addAnchor(0); // Таргет с индексом 0
+        // Привязываем объект к якорю
+        const anchor = mindarThree.addAnchor(0);
         anchor.group.add(box);
 
         // Обработка событий таргета
         anchor.onTargetFound = () => {
-            console.log("Target found");
+            console.log("Target Found");
         };
 
         anchor.onTargetLost = () => {
-            console.log("Target lost");
+            console.log("Target Lost");
         };
 
         // Анимация объекта
         const animate = () => {
-            box.rotation.y += 0.01; // Вращение объекта
+            box.rotation.y += 0.01; // Вращение куба
             renderer.render(scene, camera);
         };
 
@@ -43,7 +43,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Запуск AR
         await mindarThree.start();
         console.log("AR запущен");
-    } catch (err) {
-        console.error("Ошибка запуска MindAR.js:", err);
+    } catch (error) {
+        console.error("Ошибка запуска AR:", error);
+
+        // Проверка наличия камеры
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert("Камера не поддерживается на этом устройстве.");
+        } else {
+            alert("Проблема с доступом к камере. Проверьте разрешения.");
+        }
+    }
+});
+
+navigator.mediaDevices.enumerateDevices().then((devices) => {
+    console.log("Devices:", devices);
+    if (devices.length === 0) {
+        alert("Нет доступных камер.");
     }
 });
