@@ -1,0 +1,46 @@
+{
+    "Objects": [
+		{
+			"Name": "tech_7",
+			"ID" : "1Ryi_J2mP4UXlPVMT1P32EtXQJQP8fVDC",
+			"Position": {
+				"x": 58.7,
+				"y": 0,
+				"z": 0.0
+			},
+			"Rotation": {
+				"x": 0.0,
+				"y": 90.0,
+				"z": 0.0
+			}
+		},
+		{
+			"Name": "tech_14",
+			"ID" : "1ei5bi3Y8stSRcz3pOJo239Ck9CQUuyJw",
+			"Position": {
+				"x": -103.25,
+				"y": 0,
+				"z": 1.75
+			},
+			"Rotation": {
+				"x": 0.0,
+				"y": 90.0,
+				"z": 0.0
+			}
+		},
+		{
+			"Name": "tech_15",
+			"ID" : "1i5duQSFfFaGuw3z6sbRpwd0eKRRSkADB",
+			"Position": {
+				"x": -125.1,
+				"y": 0,
+				"z": 4.313
+			},
+			"Rotation": {
+				"x": 0.0,
+				"y": 90.0,
+				"z": 0.0
+			}
+		}
+	]
+}

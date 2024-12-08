@@ -1,30 +1,42 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Multi Markers AR - Playing the Archive - CASA UCL</title>
-    <meta
-      name="description"
-      content="Multi Markers AR - Playing the Archive - CASA UCL"
-    />
-    <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/jeromeetienne/AR.js/2.0.8/aframe/build/aframe-ar.js"></script>
-    <!-- <script src="app.js"></script> -->
-  </head>
-  <body>
-    <a-scene
-      markers_start
-      vr-mode-ui="enabled: false"
-      color-space="sRGB"
-      renderer="gammaOutput: true"
-      embedded
-      arjs="debugUIEnabled: false; sourceType: webcam; patternRatio: 0.85; trackingMethod: best;"
-    >
-      <a-entity id="userCamera" camera>
-        <a-cursor> </a-cursor>
-      </a-entity>
-      <a-marker type="pattern" url="marker.patt">
-        <a-box position="0 0 0" scale=".25 .25. .25" material="color: yellow;"></a-box>
-      </a-marker>
-    </a-scene>
-  </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Navigation</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ar.js@3.3.2/aframe/build/aframe-ar.min.js"></script>
+    <script src="js/app.js" defer></script>
+    <script src="js/navmesh.js" defer></script>
+    <script src="js/pathfinding.js" defer></script>
+    <script src="js/minimap.js" defer></script>
+</head>
+<body>
+<a-scene embedded arjs>
+    <!-- Камера -->
+    <a-entity camera look-controls></a-entity>
+
+    <!-- Маркеры для калибровки -->
+    <a-nft type="nft" url="assets/Tech_14" smooth="true" smoothCount="10" 
+        smoothTolerance=".01" smoothThreshold="5" id="marker1"></a-nft>
+    <a-nft type="nft" url="assets/Tech_15" smooth="true" smoothCount="10" 
+        smoothTolerance=".01" smoothThreshold="5" id="marker2"></a-nft>
+    <!-- <a-marker preset="custom" type="pattern" url="assets/marker1.patt" id="marker1"></a-marker> -->
+    <!-- <a-marker preset="custom" type="pattern" url="assets/marker2.patt" id="marker2"></a-marker> -->
+
+    <!-- NavMesh и маршрут -->
+    <a-entity id="navmesh-container"></a-entity>
+    <a-entity id="path-container"></a-entity>
+
+    <!-- Элементы интерфейса -->
+    <div id="ui">
+        <div id="minimap"></div>
+        <select id="target-select">
+            <option value="" disabled selected>Choose Target</option>
+        </select>
+        <button id="build-route">Build Route</button>
+    </div>
+</a-scene>
+</body>
 </html>
