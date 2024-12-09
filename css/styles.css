@@ -1,30 +1,26 @@
 body {
     margin: 0;
     padding: 0;
-    overflow: hidden;
     font-family: sans-serif;
+    /* overflow:hidden; <-- при необходимости убрать, чтобы видеть всё */
 }
 
 #ui-container {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
-    z-index: 999;
+    z-index: 9999;
     display: flex;
     background: rgba(255,255,255,0.8);
     padding: 10px;
 }
 
-#minimap-container {
-    padding: 10px;
-}
-
 #target-select-container {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    z-index: 999;
+    z-index: 9999;
     background: rgba(255,255,255,0.8);
     padding: 10px;
     box-sizing: border-box;

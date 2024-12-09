@@ -9,9 +9,9 @@ let route = [];
 
 window.addEventListener('load', () => {
     Promise.all([
-        fetch('/data/markers.json').then(r => r.json()),
-        fetch('/data/targets.json').then(r => r.json()),
-        fetch('/data/navmesh.json').then(r => r.json())
+        fetch('./markers.json').then(r => r.json()),
+        fetch('./targets.json').then(r => r.json()),
+        fetch('./navmesh.json').then(r => r.json())
     ]).then(([markersJson, targetsJson, navmeshJson]) => {
         markersData = markersJson.Objects;
         targetsData = targetsJson.Objects;
