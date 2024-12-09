@@ -1,42 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Navigation</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AR Навигация</title>
+    <!-- Подключение A-Frame -->
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ar.js@3.3.2/aframe/build/aframe-ar.min.js"></script>
-    <script src="js/app.js" defer></script>
-    <script src="js/navmesh.js" defer></script>
-    <script src="js/pathfinding.js" defer></script>
-    <script src="js/minimap.js" defer></script>
+    <!-- Подключение AR.js -->
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-<a-scene embedded arjs>
-    <!-- Камера -->
-    <a-entity camera look-controls></a-entity>
-
-    <!-- Маркеры для калибровки -->
-    <a-nft type="nft" url="assets/Tech_14" smooth="true" smoothCount="10" 
-        smoothTolerance=".01" smoothThreshold="5" id="marker1"></a-nft>
-    <a-nft type="nft" url="assets/Tech_15" smooth="true" smoothCount="10" 
-        smoothTolerance=".01" smoothThreshold="5" id="marker2"></a-nft>
-    <!-- <a-marker preset="custom" type="pattern" url="assets/marker1.patt" id="marker1"></a-marker> -->
-    <!-- <a-marker preset="custom" type="pattern" url="assets/marker2.patt" id="marker2"></a-marker> -->
-
-    <!-- NavMesh и маршрут -->
-    <a-entity id="navmesh-container"></a-entity>
-    <a-entity id="path-container"></a-entity>
-
-    <!-- Элементы интерфейса -->
-    <div id="ui">
-        <div id="minimap"></div>
-        <select id="target-select">
-            <option value="" disabled selected>Choose Target</option>
-        </select>
-        <button id="build-route">Build Route</button>
+    <div id="ui-container">
+        <div id="minimap-container">
+            <h3>Мини-карта</h3>
+            <canvas id="minimap" width="200" height="200"></canvas>
+        </div>
     </div>
-</a-scene>
+
+    <!-- Выпадающий список целей внизу экрана -->
+    <div id="target-select-container">
+        <select id="target-select">
+            <option value="">Выберите цель</option>
+        </select>
+    </div>
+
+    <a-scene 
+        embedded
+        arjs="trackingMethod: best; sourceType: webcam;"
+        renderer="logarithmicDepthBuffer: true;"
+        vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: true"
+    >
+        <a-camera gps-camera rotation-reader></a-camera>
+
+      <a-nft
+        type="nft"
+        url="markers/Tech_14"
+        smooth="true"
+        smoothCount="10"
+        smoothTolerance=".01"
+        smoothThreshold="5"
+        id="marker-tech14"
+      >
+        <a-entity
+          geometry="primitive: box; width: 0.5; height: 0.5; depth:0.5"
+          material="color: red;"
+        ></a-entity
+      ></a-nft>
+      <a-nft
+        type="nft"
+        url="markers/Tech_15"
+        smooth="true"
+        smoothCount="10"
+        smoothTolerance=".01"
+        smoothThreshold="5"
+        id="marker-tech15"
+      >
+        <a-entity
+          geometry="primitive: box; width: 0.5; height: 0.5; depth:0.5"
+          material="color: red;"
+        ></a-entity
+      ></a-nft>
+
+      <a-entity id="path-container"></a-entity>
+        <a-entity id="targets-container"></a-entity>
+    </a-scene>
+
+    <script src="/js/main.js"></script>
 </body>
 </html>
